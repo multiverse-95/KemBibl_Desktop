@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.jfoenix:jfoenix:8.0.10" level="project" />
+    <orderEntry type="library" name="org.apache.httpcomponents:httpclient:4.5.9" level="project" />
   </component>
 </module>

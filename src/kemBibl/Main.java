@@ -1,4 +1,4 @@
-package sample;
+package kemBibl;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,8 +10,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("KemBibl");
+        Parent root = FXMLLoader.load(getClass().getResource("app.fxml"));
+        primaryStage.setTitle("КемБибл");
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
     }
