@@ -146,6 +146,7 @@ public class SearchController {
         authorBook=parsingXML.AuthorBook();
         typeBook=parsingXML.TypeBook();
         dateBook=parsingXML.DateBook();
+        //System.out.println("IdBook: "+bookModels.get(0).getIdBook());
         return bookModels;
     }
 }

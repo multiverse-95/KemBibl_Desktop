@@ -86,7 +86,7 @@ public class ParsingXML {
                 if (AuthorAtr.equals("")){
                     AuthorAtr="(автор не указан)";
                 }
-                bookModels.add(new BookModel(AuthorAtr, TitleBook, DateBook, TypeBook, Image,"","","","","",""));
+                bookModels.add(new BookModel(IdBook, AuthorAtr, TitleBook, DateBook, TypeBook, Image,"","","","","",""));
 
                 IdBooks[i]=IdBook;
                 nameBook[i]=TitleBook;

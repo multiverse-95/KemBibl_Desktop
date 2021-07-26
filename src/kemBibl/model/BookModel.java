@@ -2,6 +2,7 @@ package kemBibl.model;
 
 public class BookModel {
     //property basics
+    private String idBook;
     private String author;
     private String title;
     private String date;
@@ -17,8 +18,9 @@ public class BookModel {
 
 
     //конструктор
-    public BookModel(String author, String title, String date, String type_book, String image, String del_Url, String add_Url, String date_start, String date_finish, String code_book, String filial){
+    public BookModel(String idBook, String author, String title, String date, String type_book, String image, String del_Url, String add_Url, String date_start, String date_finish, String code_book, String filial){
 
+        this.idBook = idBook;
         this.author = author;
         this.title = title;
         this.date = date;
@@ -33,6 +35,7 @@ public class BookModel {
     }
 
     //getters
+    public String getIdBook() {return idBook;}
     public String getAuthor() {return author; }
     public String getTitle() {return title; }
     public String getDate() {return date; }

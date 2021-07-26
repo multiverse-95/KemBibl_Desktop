@@ -12,12 +12,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
+import javafx.stage.Stage;
+import kemBibl.controller.ExemplController;
 import kemBibl.controller.SearchController;
 import kemBibl.model.BookModel;
 
@@ -114,6 +118,41 @@ public class appController {
                 books_list.setCellFactory(listView -> new CustomListCell());
 
                 books_list.setItems(data);
+
+                books_list.setOnMousePressed(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if (event.isPrimaryButtonDown() && event.getClickCount() == 1) {
+                            BookModel bookModel = books_list.getSelectionModel().getSelectedItem();
+                            String id_book=bookModel.getIdBook();
+                            String author_book=bookModel.getAuthor();
+                            String titlebook=bookModel.getTitle();
+
+                            System.out.println("IdBook: "+id_book);
+                            FXMLLoader loader = new FXMLLoader();
+                            loader.setLocation(getClass().getResource("/kemBibl/view/exempl_book.fxml"));
+                            try {
+                                loader.load();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Parent root = loader.getRoot();
+                            // Вызов функции обработки начислений
+                            ExemplController exemplController = loader.getController();
+                            exemplController.ShowInfoBook(id_book, author_book, titlebook ,listOfImages[0]);
+                            // Открыть окно начислений
+                            Stage stage = new Stage();
+                            stage.setTitle("Информация по книге");
+                            //stage.setResizable(false);
+                            stage.setScene(new Scene(root));
+                            stage.showAndWait();
+
+
+                        }
+                    }
+                });
+
+
             }
         });
 
@@ -148,6 +187,7 @@ public class appController {
                     setText(null);
                     setGraphic(null);
                 } else {
+
                     imageView.setImage(listOfImages[0]);
                     double imageWidth = 70.0;
                     imageView.setFitHeight(imageWidth);
