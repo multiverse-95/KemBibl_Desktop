@@ -1,6 +1,7 @@
 package kemBibl;
 
 import com.jfoenix.controls.JFXTabPane;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -11,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -53,6 +56,9 @@ public class appController {
     private Button search_button;
 
     @FXML
+    private CheckBox onlyOnlineBooks_ch;
+
+    @FXML
     private Tab userProfileTab;
 
     @FXML
@@ -77,6 +83,13 @@ public class appController {
     @FXML
     void initialize() {
         configureView();
+        search_button.setOnMouseEntered(event_mouse -> {
+            ((Node) event_mouse.getSource()).setCursor(Cursor.HAND);
+        });
+        onlyOnlineBooks_ch.setOnMouseEntered(event_mouse -> {
+            ((Node) event_mouse.getSource()).setCursor(Cursor.HAND);
+        });
+
         search_button.setOnAction(event -> {
             SearchBooks();
         });
@@ -89,77 +102,113 @@ public class appController {
 
     public void SearchBooks(){
         books_list.setItems(null);
-        // Запуск прогресса индикации
-        ProgressIndicator pi = new ProgressIndicator();
-        pi.setStyle("-fx-accent: blue");
-        VBox box = new VBox(pi);
-        box.setAlignment(Pos.CENTER);
-        // Grey Background
-        root.getChildren().add(box);
-
-        searchContainer.setDisable(true);
 
         String search=search_text.getText();
-        Task SearchTask = new SearchController.SearchTask(search,"");
+        String onlyOnlineBooks="";
+        if (onlyOnlineBooks_ch.isSelected()){
+            onlyOnlineBooks="1";
+        }
+        if (search_text.getText().isEmpty()){
+            Alert alert =new Alert(Alert.AlertType.WARNING , "Test");
+            alert.setTitle("Информация"); // Название предупреждения
+            alert.setHeaderText("Введите запрос!"); // Текст предупреждения
+            alert.setContentText("Введите данные в поле поиска!");
+            // Вызов подтверждения элемента
+            alert.showAndWait().ifPresent(rs -> {
+                if (rs == ButtonType.OK) {
 
-        // После выполнения потока
-        SearchTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                // Закрытие прогресса индикации
-                box.setDisable(true);
-                pi.setVisible(false);
-                searchContainer.setDisable(false);
-                ArrayList<BookModel> bookModels = (ArrayList<BookModel>) SearchTask.getValue();
+                }
+            });
+        } else {
 
-                ObservableList<BookModel> data = FXCollections.observableArrayList();
-                data.addAll(bookModels);
+            // Запуск прогресса индикации
+            ProgressIndicator pi = new ProgressIndicator();
+            pi.setStyle("-fx-accent: blue");
+            VBox box = new VBox(pi);
+            box.setAlignment(Pos.CENTER);
+            // Grey Background
+            root.getChildren().add(box);
 
-                books_list.setCellFactory(listView -> new CustomListCell());
+            searchContainer.setDisable(true);
+            Task SearchTask = new SearchController.SearchTask(search,"", onlyOnlineBooks);
 
-                books_list.setItems(data);
+            // После выполнения потока
+            SearchTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                @Override
+                public void handle(WorkerStateEvent event) {
+                    // Закрытие прогресса индикации
+                    box.setDisable(true);
+                    pi.setVisible(false);
+                    searchContainer.setDisable(false);
+                    ArrayList<BookModel> bookModels = (ArrayList<BookModel>) SearchTask.getValue();
+                    System.out.println("Size of search "+bookModels.size());
+                    if (bookModels.size()==0){
+                        Alert alert =new Alert(Alert.AlertType.WARNING , "Test");
+                        alert.setTitle("Информация"); // Название предупреждения
+                        alert.setHeaderText("Ничего не найдено!"); // Текст предупреждения
+                        alert.setContentText("Попробуйте изменить запрос!");
+                        // Вызов подтверждения элемента
+                        alert.showAndWait().ifPresent(rs -> {
+                            if (rs == ButtonType.OK) {
 
-                books_list.setOnMousePressed(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if (event.isPrimaryButtonDown() && event.getClickCount() == 1) {
-                            BookModel bookModel = books_list.getSelectionModel().getSelectedItem();
-                            String id_book=bookModel.getIdBook();
-                            String author_book=bookModel.getAuthor();
-                            String titlebook=bookModel.getTitle();
-
-                            System.out.println("IdBook: "+id_book);
-                            FXMLLoader loader = new FXMLLoader();
-                            loader.setLocation(getClass().getResource("/kemBibl/view/exempl_book.fxml"));
-                            try {
-                                loader.load();
-                            } catch (IOException e) {
-                                e.printStackTrace();
                             }
-                            Parent root = loader.getRoot();
-                            // Вызов функции обработки начислений
-                            ExemplController exemplController = loader.getController();
-                            exemplController.ShowInfoBook(id_book, author_book, titlebook ,listOfImages[0]);
-                            // Открыть окно начислений
-                            Stage stage = new Stage();
-                            stage.setTitle("Информация по книге");
-                            //stage.setResizable(false);
-                            stage.setScene(new Scene(root));
-                            stage.showAndWait();
-
-
-                        }
+                        });
                     }
-                });
+
+                    ObservableList<BookModel> data = FXCollections.observableArrayList();
+                    data.addAll(bookModels);
+
+                    books_list.setCellFactory(listView -> new CustomListCell());
+
+                    books_list.setItems(data);
+                    books_list.setOnMouseEntered(event_mouse -> {
+                        ((Node) event_mouse.getSource()).setCursor(Cursor.HAND);
+                    });
+                    books_list.setOnMousePressed(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            if (event.isPrimaryButtonDown() && event.getClickCount() == 1) {
+                                BookModel bookModel = books_list.getSelectionModel().getSelectedItem();
+                                String id_book=bookModel.getIdBook();
+                                String author_book=bookModel.getAuthor();
+                                String titlebook=bookModel.getTitle();
+                                String typeBook=bookModel.getTypeBook();
+                                String dateBook=bookModel.getDate();
+                                String urlBookPdf=bookModel.getUrlBookPdf();
+
+                                System.out.println("IdBook: "+id_book);
+                                FXMLLoader loader = new FXMLLoader();
+                                loader.setLocation(getClass().getResource("/kemBibl/view/exempl_book.fxml"));
+                                try {
+                                    loader.load();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                Parent root = loader.getRoot();
+                                // Вызов функции обработки начислений
+                                ExemplController exemplController = loader.getController();
+                                exemplController.ShowInfoBook(id_book, author_book, titlebook , typeBook, dateBook, listOfImages[0], urlBookPdf);
+                                // Открыть окно начислений
+                                Stage stage = new Stage();
+                                stage.setTitle("Информация по книге");
+                                //stage.setResizable(false);
+                                stage.setScene(new Scene(root));
+                                stage.showAndWait();
 
 
-            }
-        });
+                            }
+                        }
+                    });
 
-        // Запуск потока
-        Thread SearchThread = new Thread(SearchTask);
-        SearchThread.setDaemon(true);
-        SearchThread.start();
+
+                }
+            });
+            // Запуск потока
+            Thread SearchThread = new Thread(SearchTask);
+            SearchThread.setDaemon(true);
+            SearchThread.start();
+        }
+
     }
 
 
@@ -227,8 +276,22 @@ public class appController {
                 tabContainer.getSelectionModel().select(lastSelectedTabIndex);
 
                 // TODO: logout action
+
                 // good place to show Dialog window with Yes / No question
                 System.out.println("Logging out!");
+                ButtonType yes_del = new ButtonType("Да", ButtonBar.ButtonData.OK_DONE); // Создание кнопки подтвердить
+                ButtonType no_del = new ButtonType("Нет", ButtonBar.ButtonData.CANCEL_CLOSE); // Создание кнопки отменить
+                Alert alert =new Alert(Alert.AlertType.CONFIRMATION , "Test", yes_del, no_del);
+                alert.setTitle("Выход из приложения"); // Название предупреждения
+                alert.setHeaderText("Подтвердите выход из приложения!"); // Текст предупреждения
+                alert.setContentText("Вы действительно хотите выйти из приложения?");
+                // Вызов подтверждения элемента
+                alert.showAndWait().ifPresent(rs -> {
+                    if (rs == yes_del){
+                        Platform.exit();
+                        System.exit(0);
+                    }
+                });
             }
         };
 

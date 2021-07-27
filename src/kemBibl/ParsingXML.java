@@ -66,6 +66,7 @@ public class ParsingXML {
                 String TypeBook = attributes.getNamedItem("Libelle").getNodeValue();
                 String DateBook = attributes.getNamedItem("Date").getNodeValue();
                 String Image="";
+                String UrlBookPdf = attributes.getNamedItem("URL").getNodeValue();
                 //String Totalexmpl=attributes.getNamedItem("total").getNodeValue();
                 String IdBook= attributes.getNamedItem("IdNotice").getNodeValue();
                 items[i]="Название книги: "+ TitleBook+"\n\nАвтор: "+ AuthorAtr+"\n\nТип: "+TypeBook+"\n\nДата выпуска: "+DateBook;
@@ -86,7 +87,10 @@ public class ParsingXML {
                 if (AuthorAtr.equals("")){
                     AuthorAtr="(автор не указан)";
                 }
-                bookModels.add(new BookModel(IdBook, AuthorAtr, TitleBook, DateBook, TypeBook, Image,"","","","","",""));
+
+                bookModels.add(new BookModel(IdBook,AuthorAtr, TitleBook, DateBook, TypeBook, Image, UrlBookPdf,
+                        "", "", "", "", "", ""));
+                //bookModels.add(new BookModel(IdBook, AuthorAtr, TitleBook, DateBook, TypeBook, Image, UrlBookPdf,"","","",""));
 
                 IdBooks[i]=IdBook;
                 nameBook[i]=TitleBook;

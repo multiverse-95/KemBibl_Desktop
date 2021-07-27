@@ -8,6 +8,7 @@ public class BookModel {
     private String date;
     private String type_book;
     private String image;
+    private String urlBookPdf;
     private String del_Url;
     private String add_Url;
     private String date_start;
@@ -18,7 +19,7 @@ public class BookModel {
 
 
     //конструктор
-    public BookModel(String idBook, String author, String title, String date, String type_book, String image, String del_Url, String add_Url, String date_start, String date_finish, String code_book, String filial){
+    public BookModel(String idBook, String author, String title, String date, String type_book, String image, String urlBookPdf, String del_Url, String add_Url, String date_start, String date_finish, String code_book, String filial){
 
         this.idBook = idBook;
         this.author = author;
@@ -26,6 +27,7 @@ public class BookModel {
         this.date = date;
         this.type_book = type_book;
         this.image = image;
+        this.urlBookPdf = urlBookPdf;
         this.del_Url = del_Url;
         this.add_Url=add_Url;
         this.date_start=date_start;
@@ -41,6 +43,7 @@ public class BookModel {
     public String getDate() {return date; }
     public String getTypeBook() {return type_book; }
     public String getImage() { return image; }
+    public String getUrlBookPdf() { return urlBookPdf; }
     public String getDel_Url() { return del_Url; }
     public String getAdd_Url() { return add_Url; }
     public String getDate_start() { return date_start; }

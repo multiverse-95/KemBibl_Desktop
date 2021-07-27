@@ -22,14 +22,16 @@ public class SearchController {
     public static class SearchTask extends Task<ArrayList<BookModel>> {
         private final String author;
         private final String title;
+        private final String onlyOnlineBooks;
 
-        public SearchTask(String author, String title) {
+        public SearchTask(String author, String title, String onlyOnlineBooks) {
             this.author = author;
             this.title = title;
+            this.onlyOnlineBooks=onlyOnlineBooks;
         }
         @Override
         protected ArrayList<BookModel> call() throws Exception {
-            String result= SearchBooks(author);
+            String result= SearchBooks(author, onlyOnlineBooks);
             ArrayList<BookModel> bookModels = new ArrayList<>();
             bookModels= ParseXML(result);
 
@@ -37,7 +39,7 @@ public class SearchController {
         }
     }
 
-    public static String SearchBooks(String author){
+    public static String SearchBooks(String author, String onlyOnlineBooks){
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost post = new HttpPost("http://catalog.kembibl.ru/SearchForms/simpleSearch");
         String reqS = "";
@@ -54,7 +56,7 @@ public class SearchController {
         urlParameters.add(new BasicNameValuePair("data[3][value]", ""));
         urlParameters.add(new BasicNameValuePair("data[between][210_D][start]", ""));
         urlParameters.add(new BasicNameValuePair("data[between][210_D][end]", ""));
-        urlParameters.add(new BasicNameValuePair("data[exist][856_U]", "0"));
+        urlParameters.add(new BasicNameValuePair("data[exist][856_U]", onlyOnlineBooks));
         urlParameters.add(new BasicNameValuePair("data[Notice][Categ][all]", "1"));
         urlParameters.add(new BasicNameValuePair("data[Notice][Categ][1]", ""));
         urlParameters.add(new BasicNameValuePair("data[Notice][Categ][4]", ""));

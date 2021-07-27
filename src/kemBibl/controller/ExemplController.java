@@ -1,10 +1,17 @@
 package kemBibl.controller;
 
+import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
+import com.sun.javafx.application.HostServicesDelegate;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
@@ -26,9 +33,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -60,10 +70,22 @@ public class ExemplController {
     private Label info_text;
 
     @FXML
+    private Label typeBook;
+
+    @FXML
+    private Label dateBook;
+
+    @FXML
+    private Button readBook_b;
+
+    @FXML
     private WebView annotation_text;
 
     @FXML
     void initialize() {
+        readBook_b.setOnMouseEntered(event_mouse -> {
+            ((Node) event_mouse.getSource()).setCursor(Cursor.HAND);
+        });
 
     }
 
@@ -81,10 +103,39 @@ public class ExemplController {
             return BookInfo;
         }
     }
-public void ShowInfoBook(String IdBook, String AuthorBook, String TitleBook, Image ImageBook){
+
+    public void openFilePdf(String urlBookPdf) throws Exception {
+
+        readBook_b.setOnAction((ActionEvent event) -> {
+            try {
+                Desktop.getDesktop().browse(new URL(urlBookPdf).toURI());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+public void ShowInfoBook(String IdBook, String AuthorBook, String TitleBook, String typeOfBook, String DateOfBook, Image ImageBook, String urlBookPdf){
     author_text.setText(AuthorBook);
     info_text.setText(TitleBook);
+    typeBook.setText("Тип: "+typeOfBook);
+    dateBook.setText("Дата выхода: "+DateOfBook);
     img_prev.setImage(ImageBook);
+
+    System.out.println("URL PDF "+urlBookPdf);
+    if (urlBookPdf.equals("")){
+        readBook_b.setDisable(true);
+    } else {
+        try {
+            openFilePdf(urlBookPdf);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     ProgressIndicator pi = new ProgressIndicator();
     pi.setStyle("-fx-accent: blue");
     VBox box = new VBox(pi);
@@ -102,6 +153,7 @@ public void ShowInfoBook(String IdBook, String AuthorBook, String TitleBook, Ima
             box.setDisable(true);
             pi.setVisible(false);
             ExemplContainer.setDisable(false);
+
             String BookInfo= (String) BookExemplInfoTask.getValue();
             //System.out.println(BookInfo);
             annotation_text.getEngine().loadContent(BookInfo, "text/html");
