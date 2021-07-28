@@ -2,6 +2,7 @@ package kemBibl.controller;
 
 import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
 import com.sun.javafx.application.HostServicesDelegate;
+import com.sun.jndi.toolkit.url.Uri;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -34,12 +35,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.awt.*;
+import java.awt.TextField;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -169,18 +170,20 @@ public void ShowInfoBook(String IdBook, String AuthorBook, String TitleBook, Str
 
 public static String getBookExemplInfo(String IdBook){
     HttpClient httpclient = new DefaultHttpClient();
+
     HttpResponse response;
     String responseString = null;
     String statusline=null;
     String urlAddress="http://catalog.kembibl.ru/notices/getIsbdAjax/"+IdBook+"/default?IdNotice="+IdBook+"&source=default";
+    HttpGet httpGet=new HttpGet(urlAddress);
     try {
-        response = httpclient.execute(new HttpGet(urlAddress));
+        response = httpclient.execute(httpGet);
         StatusLine statusLine = response.getStatusLine();
         statusline=response.getStatusLine().toString();
         if(statusLine.getStatusCode() == HttpStatus.SC_OK){
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             response.getEntity().writeTo(out);
-            responseString = out.toString();
+            responseString = out.toString("UTF-8");
             out.close();
         } else{
             //Closes the connection.
@@ -230,6 +233,8 @@ public static String ParsingBookInfo(String responseBook){
     Matcher m0 = p0.matcher(INPUT0);   // get a matcher object
     INPUT0 = m0.replaceAll(REPLACE0);
     Text_descr=INPUT0;
+
+    //System.out.println(responseBook);
     return Text_descr;
 }
 
